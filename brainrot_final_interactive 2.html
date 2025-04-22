@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Brain Rot Simulator</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: url('brainrot_background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
+
+    .content, .emoji {
+      position: absolute;
+      white-space: nowrap;
+      font-size: 26px;
+      font-weight: bold;
+      pointer-events: auto;
+      user-select: none;
+      cursor: pointer;
+      animation: move 6s linear infinite;
+    }
+
+    @keyframes move {
+      0% { left: 100vw; }
+      100% { left: -100vw; }
+    }
+
+    .overlay {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 10px;
+      font-size: 18px;
+      border: 1px solid white;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<div id="content-container"></div>
+<div class="overlay" id="question"></div>
+
+<script>
+  const phrases = [
+    "why is my brain humming?",
+    "what does the blue mean??",
+    "404 thoughts not found",
+    "i can feel the wifi",
+    "did i just scroll into 2034",
+    "this isn't my feed",
+    "tap twice to forget",
+    "✨✨✨🌀🌀🌀",
+    "error: user not updating",
+    "0110101010101011",
+    "xX_weird_feed_Xx",
+    "$#@!*& brain.exe",
+    "🧠🧠🧠🧠🧠🧠🧠"
+  ];
+
+  const emojis = ["😵", "👀", "💥", "🤯", "🧠", "📱", "🔄", "🔥", "🌀", "👁️"];
+  const brainEmojis = ["🧠", "🧠", "🧠", "🧠"];
+  const colors = ["#FF69B4", "#00FFFF", "#ADFF2F", "#FFD700", "#FF4500"];
+
+  function createFallingEmojis(x, y) {
+    for (let i = 0; i < 10; i++) {
+      const emoji = document.createElement('div');
+      emoji.className = 'emoji';
+      emoji.style.position = 'absolute';
+      emoji.style.left = (x + Math.random() * 40 - 20) + 'px';
+      emoji.style.top = y + 'px';
+      emoji.style.color = colors[Math.floor(Math.random() * colors.length)];
+      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      emoji.style.fontSize = '24px';
+      document.body.appendChild(emoji);
+
+      const horizontalDrift = (Math.random() - 0.5) * 2;
+
+      const fall = () => {
+        let top = parseFloat(emoji.style.top);
+        let left = parseFloat(emoji.style.left);
+        emoji.style.top = (top + Math.random() * 5 + 2) + 'px';
+        emoji.style.left = (left + horizontalDrift) + 'px';
+        if (top < window.innerHeight) {
+          requestAnimationFrame(fall);
+        } else {
+          emoji.remove();
+        }
+      };
+      fall();
+    }
+  }
+
+  function createMovingText(text, isEmoji = false, sizeOverride = null) {
+    const div = document.createElement('div');
+    div.className = isEmoji ? 'emoji' : 'content';
+    div.style.top = Math.random() * window.innerHeight + 'px';
+    div.style.color = colors[Math.floor(Math.random() * colors.length)];
+    div.textContent = text;
+    div.style.left = '100vw';
+    if (sizeOverride) div.style.fontSize = sizeOverride;
+
+    div.addEventListener('mouseenter', (e) => {
+      div.style.animationPlayState = 'paused';
+      const x = e.clientX;
+      const y = e.clientY;
+      createFallingEmojis(x, y);
+      div.textContent = '💥';
+      div.style.opacity = 0.2;
+      setTimeout(() => div.remove(), 300);
+    });
+
+    document.getElementById('content-container').appendChild(div);
+    setTimeout(() => div.remove(), 10000);
+  }
+
+  setInterval(() => {
+    for (let i = 0; i < 4; i++) {
+      createMovingText(phrases[Math.floor(Math.random() * phrases.length)]);
+    }
+    for (let i = 0; i < 2; i++) {
+      createMovingText(emojis[Math.floor(Math.random() * emojis.length)], true);
+    }
+    if (Math.random() < 0.3) {
+      createMovingText(brainEmojis[Math.floor(Math.random() * brainEmojis.length)], true, '64px');
+    }
+  }, 300);
+
+  setTimeout(() => {
+    document.getElementById('question').textContent = "Do you remember what you saw a minute ago?";
+  }, 60000);
+
+  setTimeout(() => {
+    alert("Please take a break. Your brain is 17% rotted.");
+  }, 90000);
+</script>
+
+</body>
+</html>
